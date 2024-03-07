@@ -3,7 +3,7 @@ import pygame
 pygame.init()
 
 
-# MÉTODO PARA MOSTRAR FPS
+# FUNÇÃO PARA MOSTRAR FPS
 
 
 def show_fps(clock, SCREEN):
@@ -12,7 +12,7 @@ def show_fps(clock, SCREEN):
     SCREEN.blit(fps_info, (0, 0))
 
 
-# MÉTODO PARA MOSTRAR GRID
+# FUNÇÃO PARA MOSTRAR GRID
 
 
 def show_grid(SCREEN, SCREEN_WIDTH):
@@ -21,7 +21,7 @@ def show_grid(SCREEN, SCREEN_WIDTH):
         pygame.draw.line(SCREEN, "RED", (x, 1), (x, SCREEN_WIDTH), 1)
 
 
-# MÉTODO PARA MOSTRAR LEGENDA DE BINDING
+# FUNÇÃO PARA MOSTRAR LEGENDA DE BINDING
 
 
 def show_binding_caption(SCREEN, SCREEN_WIDTH):
@@ -35,7 +35,7 @@ def show_binding_caption(SCREEN, SCREEN_WIDTH):
     SCREEN.blit(caption, (SCREEN_WIDTH - caption.get_width() - 10, 10))
 
 
-# MÉTODO RESET
+# FUNÇÃO RESET
 
 
 def reset(SCREEN_CENTER, SCREEN_WIDTH, vel):
