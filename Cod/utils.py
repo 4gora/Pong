@@ -24,13 +24,16 @@ def mostrar_grid(screen, screen_witdth):
 # FUNÇÃO PARA MOSTRAR LEGENDA DOS ATALHOS
 
 
-def mostrar_legenda(tela, largura_tela):
+def mostrar_legenda(tela, largura_tela, legenda_ligada):
     fonte_legenda = pygame.font.Font("font/Pixeltype.ttf", 20)
-    legenda_txt = fonte_legenda.render(
-        "Pausar - P | Reiniciar - R | FPS - F | Mostrar grid - G | Sair do menu - I",
+    if legenda_ligada:
+        legenda_txt = fonte_legenda.render(
+        "Pausar - P | Reiniciar - R | FPS - F | Mostrar grid - G | Fechar legenda - I | Sair - ESC",
         True,
         "green",
     )
+    else:
+        legenda_txt = fonte_legenda.render("Mostrar legenda - I", True, "green")
 
     tela.blit(legenda_txt, (largura_tela - legenda_txt.get_width() - 10, 10))
 
