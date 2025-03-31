@@ -28,10 +28,10 @@ def mostrar_legenda(tela, largura_tela, legenda_ligada):
     fonte_legenda = pygame.font.Font(None, 20)
     if legenda_ligada:
         legenda_txt = fonte_legenda.render(
-        "Pausar - P | Reiniciar - R | FPS - F | Mostrar grid - G | Fechar legenda - I | Sair - ESC",
-        True,
-        "green",
-    )
+            "Pausar - P | Reiniciar - R | FPS - F | Mostrar grid - G | Fechar legenda - I | Sair - ESC",
+            True,
+            "green",
+        )
     else:
         legenda_txt = fonte_legenda.render("Mostrar legenda - I", True, "green")
 
@@ -41,7 +41,14 @@ def mostrar_legenda(tela, largura_tela, legenda_ligada):
 # FUNÇÃO RESET
 
 
-def reset(centro_tela, largura_tela, bola_velocidade, placar_jogador, placar_adversario, placar_fonte):
+def reset(
+    centro_tela,
+    largura_tela,
+    bola_velocidade,
+    placar_jogador,
+    placar_adversario,
+    placar_fonte,
+):
 
     jogador_pos = pygame.Vector2(50, 250)
     adversario_pos = pygame.Vector2(largura_tela - 70, 250)
@@ -64,3 +71,49 @@ def reset(centro_tela, largura_tela, bola_velocidade, placar_jogador, placar_adv
         placar_jogador_texto,
         placar_adversario_texto,
     )
+
+
+def mover_jogadores(
+    keys,
+    modo_jogo,
+    jogador_pos,
+    adversario_pos,
+    jogador_vel,
+    adversario_vel,
+    altura_tela,
+    jogador_rect_altura,
+):
+    if modo_jogo == "computador":
+        # Jogador 1 pode usar W/S ou as setas para se movimentar
+        if keys[pygame.K_w] or keys[pygame.K_UP]:
+            jogador_pos.y -= jogador_vel
+        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
+            jogador_pos.y += jogador_vel
+        jogador_pos.y = max(0, min(jogador_pos.y, altura_tela - jogador_rect_altura))
+
+        # Movimento automático do computador
+        adversario_pos.y += adversario_vel
+        if (
+            adversario_pos.y + jogador_rect_altura >= altura_tela
+            or adversario_pos.y <= 0
+        ):
+            adversario_vel *= -1
+
+    elif modo_jogo == "1x1":
+        # Jogador 1 usa W/S
+        if keys[pygame.K_w]:
+            jogador_pos.y -= jogador_vel
+        if keys[pygame.K_s]:
+            jogador_pos.y += jogador_vel
+        jogador_pos.y = max(0, min(jogador_pos.y, altura_tela - jogador_rect_altura))
+
+        # Jogador 2 usa as setas
+        if keys[pygame.K_UP]:
+            adversario_pos.y -= jogador_vel
+        if keys[pygame.K_DOWN]:
+            adversario_pos.y += jogador_vel
+        adversario_pos.y = max(
+            0, min(adversario_pos.y, altura_tela - jogador_rect_altura)
+        )
+
+    return jogador_pos, adversario_pos, adversario_vel

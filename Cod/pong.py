@@ -188,7 +188,19 @@ while True:
             )
 
         # MOVIMENTOS DOS JOGADORES
-        keys = pygame.key.get_pressed()
+        keys=pygame.key.get_pressed()
+        jogador_pos, adversario_pos, adversario_vel = utils.mover_jogadores(
+            keys,
+            modo_jogo,
+            jogador_pos,
+            adversario_pos,
+            jogador_vel,
+            adversario_vel,
+            altura_tela,
+            jogador_rect_altura,
+        )
+
+        """ keys = pygame.key.get_pressed()
         if modo_jogo == "computador":
             # Jogador 1 pode usar W/S ou as setas para se movimentar
             if keys[pygame.K_w] or keys[pygame.K_UP]:
@@ -222,7 +234,7 @@ while True:
             adversario_pos.y = max(
                 0, min(adversario_pos.y, altura_tela - jogador_rect_altura)
             )
-
+ """
     # TOGGLE BINDS
     if fps_ligado:
         utils.mostrar_fps(relogio, tela)
