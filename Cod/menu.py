@@ -3,7 +3,7 @@ from sys import exit
 
 def mostrar_menu(tela, largura_tela, altura_tela):
     pygame.init()
-    fonte_menu = pygame.font.Font("./font/Pixeltype.ttf", 50)
+    fonte_menu = pygame.font.Font(None, 50)
     modo_jogo = None
 
     while modo_jogo is None:
