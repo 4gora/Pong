@@ -4,43 +4,35 @@ pygame.init()
 
 
 # FUNÇÃO PARA MOSTRAR FPS
-
-
 def mostrar_fps(relogio, tela):
     fonte_info = pygame.font.Font(None, 30)
     fps_info = fonte_info.render(str(int(relogio.get_fps())), None, "green")
     tela.blit(fps_info, (0, 0))
 
 
-# FUNÇÃO PARA MOSTRAR GRID
-
-
-def mostrar_grid(screen, screen_witdth):
-    for x in range(0, screen_witdth, 50):
-        pygame.draw.line(screen, "RED", (1, x), (screen_witdth, x), 1)
-        pygame.draw.line(screen, "RED", (x, 1), (x, screen_witdth), 1)
-
-
 # FUNÇÃO PARA MOSTRAR LEGENDA DOS ATALHOS
-
-
-def mostrar_legenda(tela, largura_tela, legenda_ligada):
+def mostrar_legenda(tela, legenda_ligada):
     fonte_legenda = pygame.font.Font(None, 20)
     if legenda_ligada:
         legenda_txt = fonte_legenda.render(
-            "Pausar - P | Reiniciar - R | FPS - F | Mostrar grid - G | Fechar legenda - I | Sair - ESC",
+            "Pausar - P ou ESPAÇO | Reiniciar - R | FPS - F | Fechar legenda - I | Sair - ESC",
             True,
             "green",
         )
     else:
         legenda_txt = fonte_legenda.render("Mostrar legenda - I", True, "green")
 
-    tela.blit(legenda_txt, (largura_tela - legenda_txt.get_width() - 10, 10))
+    tela.blit(legenda_txt, (tela.get_width() - legenda_txt.get_width() - 10, 10))
 
 
-# FUNÇÃO RESET
+# TOGGLE BINDS
+def toggle_binds(relogio, tela, fps_ligado, legenda_ligada):
+    if fps_ligado:
+        mostrar_fps(relogio, tela)
+    mostrar_legenda(tela, legenda_ligada)
 
 
+# FUNÇÃO PARA REINICIAR O JOGO
 def reset(
     centro_tela,
     largura_tela,
@@ -73,7 +65,34 @@ def reset(
     )
 
 
-def mover_jogadores(
+# FUNÇÃO QUE DEFINE O MOVIMENTO DA BOLA
+def movimento_bola(
+    bola_pos, bola_vel, bola_r, largura_tela, altura_tela, jogador, adversario
+):
+    # Atualiza a posição da bola
+    bola_pos += bola_vel
+
+    # Colisão com as bordas da tela
+    if bola_pos.x - bola_r <= 0 or bola_pos.x + bola_r >= largura_tela:
+        bola_vel.x = -bola_vel.x
+    if bola_pos.y - bola_r <= 0 or bola_pos.y + bola_r >= altura_tela:
+        bola_vel.y = -bola_vel.y
+
+    # COLISÃO DA BOLA COM OS JOGADORES
+    if jogador.colliderect(
+        pygame.Rect(bola_pos.x - bola_r, bola_pos.y - bola_r, bola_r * 2, bola_r * 2)
+    ):
+        bola_vel.x = abs(bola_vel.x)
+    if adversario.colliderect(
+        pygame.Rect(bola_pos.x - bola_r, bola_pos.y - bola_r, bola_r * 2, bola_r * 2)
+    ):
+        bola_vel.x = -abs(bola_vel.x)
+
+    return bola_pos, bola_vel
+
+
+# FUNÇÃO QUE DEFINE O MOVIMENTO DOS JOGADORES
+def movimento_jogadores(
     keys,
     modo_jogo,
     jogador_pos,

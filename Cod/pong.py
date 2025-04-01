@@ -38,9 +38,8 @@ placar_adversario_rect = placar_adversario_texto.get_rect(
 
 
 fps_ligado = False  # tecla F para mostrar o FPS
-grid_ligado = False  # tecla G para mostrar o grid
-jogo_rodando = False  # tecla P o ESPAÇO para pausar o jogo
 legenda_ligada = False  # tecla I para mostrar as legendas
+jogo_rodando = False  # tecla P o ESPAÇO para pausar o jogo
 
 # ---------------------------------------------------------------------------------
 
@@ -68,9 +67,11 @@ adversario = pygame.Rect(
 bola_pos = pygame.Vector2(centro_tela)
 bola_vel = pygame.Vector2(bola_velocidade, bola_velocidade)
 bola_r = 15
-
+bola = (bola_pos, bola_vel, bola_r)
 
 modo_jogo = mostrar_menu(tela, largura_tela, altura_tela)
+
+# ---------------------------------------------------------------------------------
 
 #  LOOP PRINCIPAL
 while True:
@@ -81,14 +82,16 @@ while True:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_f:  # tecla F para mostrar o FPS
                 fps_ligado = not fps_ligado
-            elif event.key == pygame.K_g:  # tecla G para mostrar o grid
-                grid_ligado = not grid_ligado
             elif (
                 event.key == pygame.K_p or event.key == pygame.K_SPACE
             ):  # tecla P ou ESPAÇO para pausar o jogo
                 jogo_rodando = not jogo_rodando
-            elif event.key == pygame.K_r:  # tecla R para resetar o jogo
-                jogo_rodando = False
+            elif event.key == pygame.K_i:
+                legenda_ligada = not legenda_ligada
+            elif event.key == pygame.K_ESCAPE:  # tecla ESC para sair do jogo
+                pygame.quit()
+                exit()
+            elif event.key == pygame.K_r:  # tecla R para reiniciar o jogo
                 jogo_rodando = False
                 (
                     jogador_pos,
@@ -107,12 +110,6 @@ while True:
                     placar_adversario,
                     placar_fonte,
                 )
-
-            elif event.key == pygame.K_i:
-                legenda_ligada = not legenda_ligada
-            elif event.key == pygame.K_ESCAPE:  # tecla ESC para sair do jogo
-                pygame.quit()
-                exit()
 
     tela.fill("BLACK")
     tela.blit(local_titulo, rect_titulo)
@@ -135,31 +132,12 @@ while True:
     # BOLA
     pygame.draw.circle(tela, "white", bola_pos, bola_r)
 
+    keys = pygame.key.get_pressed()
+
+    # ---------------------------------------------------------------------------------
+
     # PLAY / PAUSE
     if jogo_rodando:
-
-        # DEFININDO MOVIMENTO DA BOLA
-        bola_pos += bola_vel
-
-        # COLISÃO DA BOLA COM AS BORDAS DA TELA
-        if bola_pos.x - bola_r <= 0 or bola_pos.x + bola_r >= largura_tela:
-            bola_vel.x = -bola_vel.x
-        if bola_pos.y - bola_r <= 0 or bola_pos.y + bola_r >= altura_tela:
-            bola_vel.y = -bola_vel.y
-
-        # COLISÃO DA BOLA COM OS JOGADORES
-        if jogador.colliderect(
-            pygame.Rect(
-                bola_pos.x - bola_r, bola_pos.y - bola_r, bola_r * 2, bola_r * 2
-            )
-        ):
-            bola_vel.x = abs(bola_vel.x)
-        if adversario.colliderect(
-            pygame.Rect(
-                bola_pos.x - bola_r, bola_pos.y - bola_r, bola_r * 2, bola_r * 2
-            )
-        ):
-            bola_vel.x = -abs(bola_vel.x)
 
         # PONTUAÇÃO
         if bola_pos.x - bola_r <= 0:
@@ -187,9 +165,12 @@ while True:
                 bola_velocidade * random.choice([-1, 1]),
             )
 
-        # MOVIMENTOS DOS JOGADORES
-        keys=pygame.key.get_pressed()
-        jogador_pos, adversario_pos, adversario_vel = utils.mover_jogadores(
+        # MOVIMENTO DA BOLA
+        bola_pos, bola_vel = utils.movimento_bola(
+            bola_pos, bola_vel, bola_r, largura_tela, altura_tela, jogador, adversario
+        )
+
+        jogador_pos, adversario_pos, adversario_vel = utils.movimento_jogadores(
             keys,
             modo_jogo,
             jogador_pos,
@@ -200,48 +181,7 @@ while True:
             jogador_rect_altura,
         )
 
-        """ keys = pygame.key.get_pressed()
-        if modo_jogo == "computador":
-            # Jogador 1 pode usar W/S ou as setas para se movimentar
-            if keys[pygame.K_w] or keys[pygame.K_UP]:
-                jogador_pos.y -= jogador_vel
-            if keys[pygame.K_s] or keys[pygame.K_DOWN]:
-                jogador_pos.y += jogador_vel
-            jogador_pos.y = max(
-                0, min(jogador_pos.y, altura_tela - jogador_rect_altura)
-            )
-            # MOVIMENTO DO COMPUTADOR MODO AUTOMÁTICO
-            adversario_pos.y += adversario_vel
-            if adversario.bottom >= altura_tela:
-                adversario_vel = -abs(adversario_vel)
-            elif adversario.top <= 0:
-                adversario_vel = abs(adversario_vel)
-        elif modo_jogo == "1x1":
-            # Jogador 1 usa W/S
-            if keys[pygame.K_w]:
-                jogador_pos.y -= jogador_vel
-            if keys[pygame.K_s]:
-                jogador_pos.y += jogador_vel
-            jogador_pos.y = max(
-                0, min(jogador_pos.y, altura_tela - jogador_rect_altura)
-            )
-
-            # Jogador 2 usa as setas
-            if keys[pygame.K_UP]:
-                adversario_pos.y -= jogador_vel
-            if keys[pygame.K_DOWN]:
-                adversario_pos.y += jogador_vel
-            adversario_pos.y = max(
-                0, min(adversario_pos.y, altura_tela - jogador_rect_altura)
-            )
- """
-    # TOGGLE BINDS
-    if fps_ligado:
-        utils.mostrar_fps(relogio, tela)
-    if grid_ligado:
-        utils.mostrar_grid(tela, largura_tela)
-
-    utils.mostrar_legenda(tela, largura_tela, legenda_ligada)
+    utils.toggle_binds(relogio, tela, fps_ligado, legenda_ligada)
 
     pygame.display.update()
     relogio.tick(60)
